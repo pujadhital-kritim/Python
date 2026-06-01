@@ -1,70 +1,103 @@
-from rest_framework.decorators import api_view   #This converts normal Python function into: API endpoint 
-from rest_framework.response import Response   # Used to send JSON back to React.
-from django.contrib.auth.models import User    # Django already has built-in user system.This automatically gives: username,email,password
-from django.contrib.auth import authenticate,login,logout  #Used during login.
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+from .serializer import RegisterSerializer,UserSerializer
 
-from .serializer import UserSerializer
+User=get_user_model()
 # register view 
-@api_view(['POST'])
-def registerUser(request):
+class RegisterView (APIView):
+    permission_classes =[AllowAny]  #no login needed
 
-    data= request.data
+  
 
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    username = data.get('username')
-    email = data.get('email')
-    password = data.get('password')
-    confirm_password = data.get('confirm_password')
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
 
-    # empty validation
-    if first_name == '' and   last_name == '':
-        return Response({'error': 'First name and last name is required'})
-    
-    if username == '':
-        return Response({'error': 'Username required'})
+        if serializer.is_valid():
+            user = serializer.save()
 
-    if email == '':
-        return Response({'error': 'Email required'})
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            access = refresh.access_token
 
-    if password == '':
-        return Response({'error': 'Password required'})
-    
-    #password validation
-    if password != confirm_password:
-        return Response({'error:' 'Password doesnot march'})
-    
-    #existing user validation
-    if User.objects.filter(username==username).exists:
-        return Response({'error':'Username already exists'})
-    
-     # Existing email validation
-    if User.objects.filter(email=email).exists():
-        return Response({'error': 'Email already exists'})
+            return Response({
+                "message": "Account created successfully!",
+                "user": UserSerializer(user).data,
+                "access_token": str(access),
+                "refresh_token": str(refresh),
+            }, status=status.HTTP_201_CREATED)
 
-     # Create user
-    user = User.objects.create_user(
-        first_name=first_name,
-        last_name=last_name,
-        username=username,
-        email=email,
-        password=password
-    )
-    
-    return Response(serializer.data)
+        #  only runs when validation fails
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class LoginView(APIView):
+    permission_classes = [AllowAny]  
 
-#login view 
+    def post(self, request):
+        email    = request.data.get('email')
+        password = request.data.get('password')
 
+        # Check if email exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "No account found with this email."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        # Check if password is correct
+        if not user.check_password(password):
+            return Response(
+                {"error": "Wrong password."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Password correct  generate tokens
+        refresh = RefreshToken.for_user(user)
+        access  = refresh.access_token
 
-    
+        return Response({
+            "message":       "Login successful!",
+            "user":          UserSerializer(user).data,
+            "access_token":  str(access),
+            "refresh_token": str(refresh),
+        })
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated] # must be logged in
 
-    
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh_token")
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # adds token to blacklist so it cannot be used again
+            return Response({"message": "Logged out successfully."})
+        except Exception:
+            return Response({"error": "Something went wrong."}, status=400)
+        
 
-    
+# profile view
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]  
 
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
 
+    #  update profile
+    def put(self, request):
+        # partial=True means you can update just one field, not all
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "Profile updated!",
+                "user": serializer.data
+            })
+        return Response(serializer.errors, status=400)
 
-
+  
