@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
      # Our own apps
     'users',
+    'store',
 ]
 
 MIDDLEWARE = [
