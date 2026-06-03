@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+
+:root {
+  --primary:        #7b83d4;
+  --primary-dark:   #2d3250;
+  --primary-mid:    #4f56a8;
+  --primary-light:  #6870c4;
+  --primary-xlight: #e8e9f7;
+  --primary-pale:   #f4f5fb;
+
+  --secondary:      #c4a34f;
+  --secondary-lt:   #f7f2e6;
+
+  --white:          #ffffff;
+  --bg:             #ffffff;
+
+  --text-dark:      #0f1117;
+  --text-mid:       #3a3d4a;
+  --text-light:     #7a7e93;
+  --text-xlight:    #b8bcc9;
+
+  --border:         #dddfe8;
+  --border-light:   #eeeef5;
+
+  --shadow-xs:  0 1px 3px rgba(30,34,53,0.07);
+  --shadow-sm:  0 2px 8px rgba(30,34,53,0.08);
+  --shadow-md:  0 4px 20px rgba(30,34,53,0.10);
+  --shadow-lg:  0 8px 40px rgba(30,34,53,0.14);
+  --shadow-grn: 0 4px 20px rgba(79,86,168,0.28);
+
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+  --radius-full: 999px;
+
+  --font-body:    'Inter', sans-serif;
+  --font-display: 'Playfair Display', serif;
+
+  --transition:      all 0.2s ease;
+  --transition-slow: all 0.35s ease;
+
+  --btn-bg:    #2d3250;
+  --btn-hover: #4f56a8;
+  --btn-text:  #ffffff;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--primary-mid);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+button,
+.btn {
+  font-family: var(--font-body);
+  cursor: pointer;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+button:hover,
+.btn:hover {
+  background: var(--btn-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-mid);
+  border: 1px solid var(--primary-mid);
+}
+
+.btn-outline:hover {
+  background: var(--primary-mid);
+  color: #ffffff;
+}
+
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul {
+  list-style: none;
+}

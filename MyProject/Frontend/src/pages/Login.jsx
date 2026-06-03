@@ -1,163 +1,125 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import "../styles/Auth.css";
 
 const Login = () => {
   const { login } = useAuth();
   const navigate  = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email:    "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error,    setError]    = useState("");
+  const [loading,  setLoading]  = useState(false);
 
-  const [error,   setError]   = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login(formData);
-      navigate("/");  // go to home after login
+      navigate("/");
     } catch (err) {
       const data = err.response?.data;
-      if (data?.error) {
-        setError(data.error);
-      } else {
-        setError("Something went wrong. Try again.");
-      }
+      setError(data?.error || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Welcome Back!</h2>
-        <p style={styles.subtitle}>Login to your account</p>
+    <div className="auth">
 
-        {error && <div style={styles.error}>{error}</div>}
+      {/* Left panel */}
+      <div className="auth__left">
+        <div className="auth__brand">
+          <div className="auth__brand-logo">
+            <div className="auth__brand-icon">🛒</div>
+            <div className="auth__brand-name">Haat<span>Bazaar</span></div>
+          </div>
+          <div className="auth__tagline">
+            Fresh Local Goods,<br /><span>Delivered to You</span>
+          </div>
+          <p className="auth__desc">
+            Discover authentic Nepali products — from farm-fresh food to
+            handcrafted art — sourced directly from your community.
+          </p>
+          <div className="auth__features">
+            <div className="auth__feature">
+              <span className="auth__feature-text">100% fresh & locally sourced</span>
+            </div>
+            <div className="auth__feature">
+              <span className="auth__feature-text">Support local farmers & vendors</span>
+            </div>
+            <div className="auth__feature">
+              <span className="auth__feature-text">Fast delivery to your doorstep</span>
+            </div>
+            <div className="auth__feature">
+              <span className="auth__feature-text">Best prices, no middlemen</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={styles.field}>
-            <label style={styles.label}>Email</label>
-            <input
-              style={styles.input}
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+      {/* Right panel */}
+      <div className="auth__right">
+        <div className="auth__form-box">
+          <div className="auth__form-header">
+            <h2 className="auth__form-title">Welcome back </h2>
+            <p className="auth__form-subtitle">Sign in to your account to continue</p>
           </div>
 
-          <div style={styles.field}>
-            <label style={styles.label}>Password</label>
-            <input
-              style={styles.input}
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {error && (
+            <div className="auth__error"><span>⚠️</span> {error}</div>
+          )}
 
-          <button style={styles.button} type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit}>
+            <div className="auth__field">
+              <label className="auth__label">Email Address</label>
+              <div className="auth__input-wrap">
+                <input
+                  className="auth__input"
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
-        <p style={styles.link}>
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
+            <div className="auth__field">
+              <label className="auth__label">Password</label>
+              <div className="auth__input-wrap">
+                <input
+                  className="auth__input"
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <button className="auth__submit" type="submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In →"}
+            </button>
+          </form>
+
+          <div className="auth__divider">or</div>
+
+          <p className="auth__footer">
+            Don't have an account? <Link to="/register">Create one free</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    minHeight:       "100vh",
-    display:         "flex",
-    alignItems:      "center",
-    justifyContent:  "center",
-    backgroundColor: "#f0f2f5",
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding:         "40px",
-    borderRadius:    "12px",
-    boxShadow:       "0 4px 20px rgba(0,0,0,0.1)",
-    width:           "100%",
-    maxWidth:        "420px",
-  },
-  title: {
-    margin:     "0 0 6px",
-    fontSize:   "26px",
-    fontWeight: "700",
-    color:      "#1a1a2e",
-  },
-  subtitle: {
-    margin:     "0 0 24px",
-    color:      "#666",
-    fontSize:   "14px",
-  },
-  error: {
-    backgroundColor: "#ffe0e0",
-    color:           "#c0392b",
-    padding:         "10px 14px",
-    borderRadius:    "8px",
-    marginBottom:    "16px",
-    fontSize:        "14px",
-  },
-  field: {
-    marginBottom: "16px",
-  },
-  label: {
-    display:      "block",
-    marginBottom: "6px",
-    fontWeight:   "600",
-    fontSize:     "14px",
-    color:        "#333",
-  },
-  input: {
-    width:        "100%",
-    padding:      "10px 14px",
-    borderRadius: "8px",
-    border:       "1px solid #ddd",
-    fontSize:     "14px",
-    outline:      "none",
-    boxSizing:    "border-box",
-  },
-  button: {
-    width:           "100%",
-    padding:         "12px",
-    backgroundColor: "#4f46e5",
-    color:           "#fff",
-    border:          "none",
-    borderRadius:    "8px",
-    fontSize:        "16px",
-    fontWeight:      "600",
-    cursor:          "pointer",
-    marginTop:       "8px",
-  },
-  link: {
-    textAlign: "center",
-    marginTop: "20px",
-    fontSize:  "14px",
-    color:     "#666",
-  },
 };
 
 export default Login;

@@ -1,44 +1,31 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import Landing  from "./pages/Landing";
 import Login    from "./pages/Login";
 import Register from "./pages/Register";
-import Home     from "./pages/Home";
+import "./styles/global.css";
 
-// Protected Route — redirects to login if not logged in
-const ProtectedRoute = ({ children }) => {
+// Logged-in users cannot see login/register  redirect to home
+const PublicOnly = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
-  return user ? children : <Navigate to="/login" />;
-};
-
-// Public Route — redirects to home if already logged in
-const PublicRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
+  if (loading) return null;
   return user ? <Navigate to="/" /> : children;
 };
 
-const AppRoutes = () => {
-  return (
-    <Routes>
-      {/* Public routes — only for non logged in users */}
-      <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<Landing />} />
+    <Route path="/login"    element={<PublicOnly><Login /></PublicOnly>} />
+    <Route path="/register" element={<PublicOnly><Register /></PublicOnly>} />
+  </Routes>
+);
 
-      {/* Protected routes — only for logged in users */}
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-    </Routes>
-  );
-};
-
-const App = () => {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
-  );
-};
+const App = () => (
+  <BrowserRouter>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  </BrowserRouter>
+);
 
 export default App;
