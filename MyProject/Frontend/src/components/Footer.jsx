@@ -18,7 +18,7 @@ const Footer = () => (
         </p>
         <div className="footer__contact">
           <div className="footer__contact-item"> Kathmandu, Nepal</div>
-          <div className="footer__contact-item">✉️ support@haatbazaar.com.np</div>
+          <div className="footer__contact-item"> info@haatbazaar.com.np</div>
         </div>
       </div>
 

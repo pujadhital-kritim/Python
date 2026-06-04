@@ -4,6 +4,7 @@ import Landing  from "./pages/Landing";
 import Login    from "./pages/Login";
 import Register from "./pages/Register";
 import "./styles/global.css";
+import ProductDetail from "./pages/ProductDetail";
 
 // Logged-in users cannot see login/register  redirect to home
 const PublicOnly = ({ children }) => {
@@ -15,6 +16,7 @@ const PublicOnly = ({ children }) => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Landing />} />
+    <Route path="/products/:id" element={<ProductDetail/>} />
     <Route path="/login"    element={<PublicOnly><Login /></PublicOnly>} />
     <Route path="/register" element={<PublicOnly><Register /></PublicOnly>} />
   </Routes>

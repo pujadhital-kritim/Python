@@ -7,7 +7,7 @@ import API from "../api/axios";
 import "../styles/Landing.css";
 
 
-const getEmoji = (tag) => EMOJI_MAP[tag?.toLowerCase()] || EMOJI_MAP.default;
+
 
 const TAGS = ["All", "Food", "Handicraft", "Clothing", "Herbs", "Dairy", "Art", "Pottery", "Jewelry", "Grains", "Honey"];
 
@@ -18,11 +18,7 @@ const FEATURES = [
   { icon: "🤝", title: "Support Local Economy",  desc: "Every purchase supports a local family and strengthens our community." },
 ];
 
-const TESTIMONIALS = [
-  { name: "Sita Sharma",    place: "Kathmandu", text: "I love how easy it is to find authentic Nepali products here. The quality is amazing and delivery is always on time!", stars: 5 },
-  { name: "Ram Bahadur",    place: "Pokhara",   text: "Found the best Dhaka fabric I've ever seen. Supporting local weavers while getting premium quality — what more could you want?", stars: 5 },
-  { name: "Priya Shrestha", place: "Lalitpur",  text: "The homemade pickles and dairy products taste just like what my grandmother used to make. Truly authentic!", stars: 5 },
-];
+
 
 const SkeletonCard = () => (
   <div className="sk-card">
@@ -39,7 +35,6 @@ const SkeletonCard = () => (
 const LoginModal = ({ onClose }) => (
   <div className="modal-overlay" onClick={onClose}>
     <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <div className="modal__icon">🔐</div>
       <div className="modal__title">Login Required</div>
       <div className="modal__desc">
         You need to be logged in to add items to cart or place orders.
@@ -54,19 +49,29 @@ const LoginModal = ({ onClose }) => (
 );
 
 const ProductCard = ({ product, onAddToCart }) => {
+  const navigate = useNavigate();
   const isOut = product.stock === 0;
   const isLow = !isOut && product.stock <= 5;
 
+  const handleCardClick = () => {
+    navigate(`/products/${product.id}`);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); // prevent card click
+    onAddToCart(product);
+  };
+
+ 
+
   return (
-    <div className="pcard">
-      {/* Badges */}
+    <div className="pcard" onClick={handleCardClick}>
       <div className="pcard__badges">
         {isOut  && <span className="pcard__badge pcard__badge--out">Out of Stock</span>}
         {isLow  && <span className="pcard__badge pcard__badge--hot">Only {product.stock} left!</span>}
         {!isOut && !isLow && product.id % 4 === 0 && <span className="pcard__badge pcard__badge--new">New</span>}
       </div>
 
-      <button className="pcard__wish">🤍</button>
 
       {/* Image */}
       <div className="pcard__img-wrap">
@@ -94,7 +99,7 @@ const ProductCard = ({ product, onAddToCart }) => {
           </div>
           <button
             className="pcard__add"
-            onClick={() => onAddToCart(product)}
+            onClick={handleAddToCart}
             disabled={isOut}
             title={isOut ? "Out of stock" : "Add to cart"}
           >+</button>
@@ -113,14 +118,12 @@ const Landing = () => {
   const [loading, setLoading]         = useState(true);
   const [activeTag, setActiveTag]     = useState("All");
   const [search, setSearch]           = useState("");
-  const [showModal, setShowModal]     = useState(false);  // login required modal
+  const [showModal, setShowModal]     = useState(false);
 
-  // fetch products on load  tag change
   useEffect(() => {
     fetchProducts();
   }, [activeTag, search]);
 
-  // read tag from URL query param
   useEffect(() => {
     const tag = searchParams.get("tag");
     if (tag) setActiveTag(tag.charAt(0).toUpperCase() + tag.slice(1));
@@ -130,7 +133,7 @@ const Landing = () => {
     setLoading(true);
     try {
       let url = "/products/?";
-      if (search)                       url += `search=${search}&`;
+      if (search)                           url += `search=${search}&`;
       if (activeTag && activeTag !== "All") url += `tag=${activeTag}&`;
       const res = await API.get(url);
       setProducts(res.data);
@@ -141,7 +144,6 @@ const Landing = () => {
     }
   };
 
-  /* Add to cart  if not logged in, show modal */
   const handleAddToCart = (product) => {
     if (!user) {
       setShowModal(true);
@@ -157,7 +159,6 @@ const Landing = () => {
     <div>
       <Navbar onSearch={handleSearch} />
 
-      {/* Login required modal */}
       {showModal && <LoginModal onClose={() => setShowModal(false)} />}
 
       {/* ── Hero ── */}
@@ -174,7 +175,7 @@ const Landing = () => {
           </p>
           <div className="hero__actions">
             <a href="#products" className="hero__btn hero__btn--primary">
-              🛍️ Shop Now
+               Shop Now
             </a>
             {!user && (
               <Link to="/register" className="hero__btn hero__btn--outline">
@@ -184,7 +185,7 @@ const Landing = () => {
           </div>
           <div className="hero__trust">
             <div className="hero__trust-item">Verified Sellers</div>
-            <div className="hero__trust-item"> Secure Payments</div>
+            <div className="hero__trust-item">Secure Payments</div>
             <div className="hero__trust-item"> Easy Returns</div>
           </div>
         </div>
@@ -246,7 +247,6 @@ const Landing = () => {
           </div>
         ) : products.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state__icon">🔍</div>
             <div className="empty-state__title">No products found</div>
             <div className="empty-state__sub">Try a different tag or search</div>
           </div>
@@ -278,15 +278,11 @@ const Landing = () => {
         </div>
       </section>
 
-      
-
-    
-
       {/* ── CTA Banner ── */}
       {!user && (
         <div className="cta-banner">
           <div className="cta-banner__content">
-            <div className="cta-banner__title">Ready to Shop Local? 🛒</div>
+            <div className="cta-banner__title">Ready to Shop Local? </div>
             <div className="cta-banner__sub">
               Join thousands of Nepalis supporting local — create your free account today.
             </div>

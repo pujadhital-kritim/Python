@@ -5,7 +5,6 @@
   margin-top: 60px;
 }
 
-/* Newsletter */
 .footer__newsletter {
   background: #4f56a8;
   padding: 24px 60px;
@@ -15,8 +14,8 @@
   gap: 24px;
   flex-wrap: wrap;
 }
-.footer__newsletter-text h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 3px; }
-.footer__newsletter-text p  { font-size: 13px; color: rgba(255,255,255,0.7); }
+.footer__newsletter-text h3 { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.footer__newsletter-text p  { font-size: 16px; color: rgba(255,255,255,0.7); }
 .footer__newsletter-form {
   display: flex;
   border-radius: var(--radius-full);
@@ -26,7 +25,7 @@
   padding: 10px 18px;
   border: none;
   outline: none;
-  font-size: 13px;
+  font-size: 16px;
   width: 260px;
   background: #fff;
   color: #111;
@@ -36,7 +35,7 @@
   background: #2d3250;
   color: #fff;
   border: none;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
@@ -59,19 +58,19 @@
   margin-bottom: 12px;
   text-decoration: none;
 }
-.footer__logo-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #fff; }
+.footer__logo-name { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #fff; }
 .footer__logo-name span { color: #7b83d4; }
-.footer__brand-desc { font-size: 13px; color: #6b7280; line-height: 1.75; margin-bottom: 18px; max-width: 280px; }
+.footer__brand-desc { font-size: 16px; color: #6b7280; line-height: 1.75; margin-bottom: 18px; max-width: 280px; }
 
 /* Contact */
 .footer__contact { display: flex; flex-direction: column; gap: 9px; }
-.footer__contact-item { display: flex; align-items: center; gap: 9px; font-size: 13px; color: #6b7280; }
+.footer__contact-item { display: flex; align-items: center; gap: 9px; font-size: 16px; color: #6b7280; }
 .footer__contact-item svg,
 .footer__contact-item i { color: #7b83d4; flex-shrink: 0; }
 
 /* Columns */
 .footer__col-title {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   color: #fff;
   text-transform: uppercase;
@@ -82,7 +81,7 @@
 }
 .footer__links { display: flex; flex-direction: column; gap: 10px; }
 .footer__link {
-  font-size: 13px;
+  font-size: 16px;
   color: #6b7280;
   text-decoration: none;
   transition: var(--transition);
