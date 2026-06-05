@@ -63,7 +63,7 @@ export default function ProductDetail() {
     );
   }
 
-  // Support both a single image field OR an images array
+  // Support both a single image field or an images array
   const images = product.images?.length
     ? product.images
     : product.image
