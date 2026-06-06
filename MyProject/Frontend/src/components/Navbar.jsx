@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Navbar.css";
+import { useCart } from "../context/CartContext";
 
 const Navbar = ({ onSearch }) => {
   const { user, logout }         = useAuth();
@@ -9,6 +10,7 @@ const Navbar = ({ onSearch }) => {
   const [dropdown, setDropdown]   = useState(false);
   const [searchVal, setSearchVal] = useState("");
   const dropdownRef               = useRef(null);
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const handler = (e) => {
@@ -67,11 +69,14 @@ const Navbar = ({ onSearch }) => {
         <div className="navbar__right">
           {user ? (
             <>
-              <Link to="/cart" className="navbar__icon-btn">
-                <span className="navbar__icon-btn-icon">🛒</span>
-                <span className="navbar__icon-btn-label">Cart</span>
-                <span className="navbar__badge">0</span>
-              </Link>
+             <Link to="/cart" className="navbar__icon-btn">
+  <span className="navbar__icon-btn-icon">🛒</span>
+  <span className="navbar__icon-btn-label">Cart</span>
+  {/* shows count only when cart has items */}
+  {cartCount > 0 && (
+    <span className="navbar__badge">{cartCount}</span>
+  )}
+</Link>
 
               <Link to="/orders" className="navbar__icon-btn">
                 <span className="navbar__icon-btn-icon">📦</span>

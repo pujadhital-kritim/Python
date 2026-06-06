@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
 import "../styles/Landing.css";
+import { useCart } from "../context/CartContext";
 
 
 
@@ -52,6 +53,8 @@ const ProductCard = ({ product, onAddToCart }) => {
   const navigate = useNavigate();
   const isOut = product.stock === 0;
   const isLow = !isOut && product.stock <= 5;
+  const { addToCart } = useCart();
+const [addingId, setAddingId] = useState(null);
 
   const handleCardClick = () => {
     navigate(`/products/${product.id}`);
@@ -61,6 +64,7 @@ const ProductCard = ({ product, onAddToCart }) => {
     e.stopPropagation(); // prevent card click
     onAddToCart(product);
   };
+  
 
  
 
@@ -120,9 +124,21 @@ const Landing = () => {
   const [search, setSearch]           = useState("");
   const [showModal, setShowModal]     = useState(false);
 
+   const { addToCart } = useCart();
+const [addingId, setAddingId] = useState(null);
+const [toast, setToast] = useState(null);
+
   useEffect(() => {
     fetchProducts();
   }, [activeTag, search]);
+
+  const showToast = (message, type = "success") => {
+  setToast({ message, type });
+
+  setTimeout(() => {
+    setToast(null);
+  }, 2500);
+};
 
   useEffect(() => {
     const tag = searchParams.get("tag");
@@ -144,17 +160,31 @@ const Landing = () => {
     }
   };
 
-  const handleAddToCart = (product) => {
-    if (!user) {
-      setShowModal(true);
-      return;
-    }
-    // Cart logic coming in Phase 3
-    alert(`"${product.name}" added to cart!`);
-  };
+  const handleAddToCart = async (product) => {
+  // not logged in → show login modal
+  if (!user) {
+    setShowModal(true);
+    return;
+  }
+
+  setAddingId(product.id);
+
+  // call CartContext function
+  const result = await addToCart(product.id, 1);
+
+  if (result.success) {
+    showToast(`"${product.name}" added to cart! 🛒`);
+  } else {
+    showToast(result.message, "error");
+  }
+
+  setAddingId(null);
+};
 
   const handleSearch = (val) => setSearch(val);
 
+
+ 
   return (
     <div>
       <Navbar onSearch={handleSearch} />
@@ -208,6 +238,12 @@ const Landing = () => {
           </div>
         </div>
       </section>
+
+       {toast && (
+  <div className={`toast toast--${toast.type}`}>
+    {toast.message}
+  </div>
+)}
 
       {/* ── Products ── */}
       <section className="section section--grey" id="products">

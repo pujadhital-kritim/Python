@@ -4,6 +4,8 @@ import API from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/ProductDetail.css";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -13,6 +15,70 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeImg, setActiveImg] = useState(0);
+  const { user } = useAuth();
+const { addToCart } = useCart();
+
+const [showModal, setShowModal] = useState(false);
+const [adding, setAdding] = useState(false);
+const [toast, setToast] = useState(null);
+
+
+const showToast = (message, type = "success") => {
+  setToast({ message, type });
+
+  setTimeout(() => {
+    setToast(null);
+  }, 2500);
+};
+
+const handleAddToCart = async () => {
+  if (!user) {
+    setShowModal(true);
+    return;
+  }
+
+  setAdding(true);
+
+  const result = await addToCart(product.id, 1);
+
+  if (result.success) {
+    showToast(`"${product.name}" added to cart 🛒`);
+  } else {
+    showToast(result.message, "error");
+  }
+
+  setAdding(false);
+};
+
+
+{showModal && (
+  <div className="modal-overlay" onClick={() => setShowModal(false)}>
+    <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal__title">Login Required</div>
+      <div className="modal__desc">
+        You need to login to add items to cart.
+      </div>
+
+      <div className="modal__actions">
+        <button
+          className="modal__btn modal__btn--outline"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="modal__btn modal__btn--primary"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -70,6 +136,7 @@ export default function ProductDetail() {
     ? [{ image: product.image }]
     : [];
 
+  
   return (
     <div>
       <Navbar />
@@ -151,10 +218,20 @@ export default function ProductDetail() {
                 </span>
               </div>
             )}
+              {toast && (
+  <div className={`toast toast--${toast.type}`}>
+    {toast.message}
+  </div>
+)}
 
             <div className="pd-actions">
-              <button className="pd-btn pd-btn--primary">Add to Cart</button>
-            </div>
+<button
+  className="pd-btn pd-btn--primary"
+  onClick={handleAddToCart}
+  disabled={product.stock === 0 || adding}
+>
+  {adding ? "Adding..." : "Add to Cart"}
+</button>            </div>
           </section>
         </div>
       </div>
