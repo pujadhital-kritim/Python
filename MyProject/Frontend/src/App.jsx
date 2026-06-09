@@ -7,8 +7,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Orders   from "./pages/Orders";
 
 import "./styles/global.css";
+
 
 // Loggedi n users cannot access Login/Register
 const PublicOnly = ({ children }) => {
@@ -36,6 +39,8 @@ const AppRoutes = () => {
       <Route path="/login" element={ <PublicOnly> <Login /></PublicOnly> }/>
       <Route path="/register" element={ <PublicOnly><Register /></PublicOnly>}/>
       <Route path="/cart" element={<ProtectedRoute> <Cart /> </ProtectedRoute>} />
+      <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+      <Route path="/orders"   element={<ProtectedRoute><Orders /></ProtectedRoute>} />
     </Routes>
   );
 };

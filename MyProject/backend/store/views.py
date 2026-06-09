@@ -10,7 +10,6 @@ class ProductListView(APIView):
     #anyone can view product only admin can create
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-
     #GET api/products/  list all products
     def get(self,request):
         products= Product.objects.all().order_by('created_at')
@@ -32,7 +31,7 @@ class ProductListView(APIView):
     
 
 
-    # create a new product > admin only
+    # create a new product -  admin only
 
     def post(self,request):
         if not request.user.is_staff:
