@@ -9,6 +9,7 @@ from .serializers import PaymentSerializer
 from order.models import Order
 
 
+
 #  Initiate Payment
 # React calls this first to get Khalti payment URL
 class InitiateKhaltiPaymentView(APIView):
@@ -17,41 +18,41 @@ class InitiateKhaltiPaymentView(APIView):
     def post(self, request):
         order_id = request.data.get('order_id')
 
-        # Get the order
+        print("=== PAYMENT INITIATE ===")
+        print("Order ID received:", order_id)
+
         try:
             order = Order.objects.get(
                 id=order_id,
                 user=request.user
             )
+            print("Order found:", order.id, "Total:", order.grand_total)
         except Order.DoesNotExist:
             return Response(
                 {"error": "Order not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Check order is not already paid
         if order.is_paid:
             return Response(
                 {"error": "Order is already paid."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Check order is not cancelled
         if order.status == 'cancelled':
             return Response(
                 {"error": "Cannot pay for cancelled order."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Khalti needs amount in PAISA (1 Rs = 100 paisa)
         amount_in_paisa = int(float(order.grand_total) * 100)
+        print("Amount in paisa:", amount_in_paisa)
 
-        # Prepare data to send to Khalti
         payload = {
             "return_url": f"{settings.FRONTEND_URL}/payment/verify/",
             "website_url": settings.FRONTEND_URL,
-            "amount": amount_in_paisa,
-            "purchase_order_id": str(order.id),
+            "amount":      amount_in_paisa,
+            "purchase_order_id":   str(order.id),
             "purchase_order_name": f"HaatBazaar Order #{order.id}",
             "customer_info": {
                 "name":  order.full_name,
@@ -60,11 +61,13 @@ class InitiateKhaltiPaymentView(APIView):
             },
         }
 
-        # Call Khalti API to initiate payment
         headers = {
             "Authorization": f"Key {settings.KHALTI_SECRET_KEY}",
             "Content-Type":  "application/json",
         }
+
+        print("Payload being sent to Khalti:", payload)
+        print("Khalti Secret Key exists:", bool(settings.KHALTI_SECRET_KEY))
 
         try:
             khalti_response = requests.post(
@@ -74,23 +77,28 @@ class InitiateKhaltiPaymentView(APIView):
                 timeout=30
             )
             khalti_data = khalti_response.json()
-        except requests.exceptions.RequestException:
+
+            # ← These will show in Django terminal
+            print("Khalti Status Code:", khalti_response.status_code)
+            print("Khalti Response Data:", khalti_data)
+
+        except requests.exceptions.RequestException as e:
+            print("Request Exception:", e)
             return Response(
-                {"error": "Failed to connect to Khalti. Try again."},
+                {"error": "Failed to connect to Khalti."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
 
-        # Check if Khalti returned error
         if khalti_response.status_code != 200:
+            print("KHALTI ERROR:", khalti_data)
             return Response(
                 {
-                    "error": "Khalti initiation failed.",
+                    "error":  "Khalti initiation failed.",
                     "detail": khalti_data
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Save payment record in our database
         payment, created = Payment.objects.get_or_create(
             order=order,
             defaults={
@@ -101,19 +109,16 @@ class InitiateKhaltiPaymentView(APIView):
             }
         )
 
-        #  payment already existed update pidx
         if not created:
             payment.pidx   = khalti_data.get('pidx')
             payment.status = 'initiated'
             payment.save()
 
-        # Returns Khalti payment URL to React it will redirect user to this URL
         return Response({
             "payment_url": khalti_data.get('payment_url'),
             "pidx":        khalti_data.get('pidx'),
             "order_id":    order.id,
         })
-
 
 #  Verify Payment
 # After user pays on Khalti, they come back to our site React sends pidx to this endpoint to verify
@@ -229,3 +234,4 @@ class PaymentStatusView(APIView):
                 {"error": "No payment found for this order."},
                 status=status.HTTP_404_NOT_FOUND
             )
+        

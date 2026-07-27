@@ -1,0 +1,25 @@
+ source /home/pujadhital/Downloads/Python/MyProject/venv/bin/activate
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Virtual Environment
+venv/
+env/
+
+# Django
+db.sqlite3
+media/
+
+# Environment Variables
+.env
+
+# Node
+Frontend/node_modules/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log

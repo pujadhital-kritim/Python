@@ -108,18 +108,24 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ── Static & Media ────────────────────────────────
+# Static & Media
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+env_path = BASE_DIR / '.env'
+load_dotenv(dotenv_path=env_path)
+
 # Khalti Payment 
 # Secret key comes from .env file
-KHALTI_SECRET_KEY = os.getenv('KHALTI_SECRET_KEY')
-KHALTI_VERIFY_URL = "https://a.khalti.com/api/v2/epayment/lookup/"
-KHALTI_INITIATE_URL = "https://a.khalti.com/api/v2/epayment/initiate/"
+KHALTI_PUBLIC_KEY   = os.getenv('KHALTI_PUBLIC_KEY')
+KHALTI_SECRET_KEY   = os.getenv('KHALTI_SECRET_KEY')
+KHALTI_INITIATE_URL = os.getenv('KHALTI_INITIATE_URL')
+KHALTI_VERIFY_URL   = os.getenv('KHALTI_VERIFY_URL')
+FRONTEND_URL        = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
 # Frontend URL 
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')

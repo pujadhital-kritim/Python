@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout";
 import Orders   from "./pages/Orders";
 
 import "./styles/global.css";
+import PaymentVerify from "./pages/PaymentVerify";
 
 
 // Loggedi n users cannot access Login/Register
@@ -35,6 +36,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/payment/verify"    element={<PaymentVerify />} />
       <Route path="/products/:id" element={<ProductDetail />} />
       <Route path="/login" element={ <PublicOnly> <Login /></PublicOnly> }/>
       <Route path="/register" element={ <PublicOnly><Register /></PublicOnly>}/>

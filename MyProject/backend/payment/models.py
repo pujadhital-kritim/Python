@@ -10,15 +10,12 @@ class Payment(models.Model):
     Created when user initiates payment.
     Updated when payment is verified.
     """
-
     STATUS_CHOICES = [
         ('initiated','Initiated'),
         ('completed',  'Completed'),   
         ('failed',     'Failed'),    
         ('refunded',   'Refunded'),  
-
     ]
-
     order = models.OneToOneField(
         Order,
         on_delete=models.CASCADE,
@@ -30,7 +27,6 @@ class Payment(models.Model):
         on_delete=models.CASCADE,
         related_name='payments'
     )
-
     # khalti specific fields
     pidx        = models.CharField(
                       max_length=200,

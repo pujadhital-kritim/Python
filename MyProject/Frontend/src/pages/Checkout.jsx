@@ -108,32 +108,45 @@ const Checkout = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Place order
-  const handlePlaceOrder = async () => {
-    if (!validate()) return;
-    if (!cart?.items?.length) {
-      setServerError("Your cart is empty!");
-      return;
-    }
+const handlePlaceOrder = async () => {
+  //  Validate form
+  if (!validate()) return;
 
-    setLoading(true);
-    setServerError("");
+  if (!cart?.items?.length) {
+    setServerError("Your cart is empty!");
+    return;
+  }
 
-    try {
-      const res = await API.post("/orders/place/", formData);
-      setPlacedOrder(res.data.order);
-      await clearCart();
-    } catch (err) {
-      const data = err.response?.data;
-      if (data?.error) {
-        setServerError(data.error);
-      } else {
-        setServerError("Something went wrong. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setServerError("");
+
+  try {
+    //  Place the order first
+    const orderRes = await API.post("/orders/place/", formData);
+    const order    = orderRes.data.order;
+
+    // Clear cart state
+    await clearCart();
+
+    //  Initiate Khalti payment with the order id
+    const paymentRes = await API.post("/payment/initiate/", {
+      order_id: order.id,
+    });
+
+    //  Redirect to Khalti payment page Khalti gives us a payment_url  we redirect user there
+    const paymentUrl = paymentRes.data.payment_url;
+    window.location.href = paymentUrl;
+
+  } catch (err) {
+    const data = err.response?.data;
+    if (data?.error) {
+      setServerError(data.error);
+    } else {
+      setServerError("Something went wrong. Please try again.");
     }
-  };
+    setLoading(false);
+  }
+};
 
   if (placedOrder) {
     return (
@@ -379,17 +392,16 @@ const Checkout = () => {
               </span>
             </div>
 
-            {/* Place order button */}
-            <button
-              className="place-order-btn"
-              onClick={handlePlaceOrder}
-              disabled={loading || !cart?.items?.length}
-            >
-              {loading
-                ? "Placing Order..."
-                : `Place Order · Rs. ${grandTotal.toLocaleString()}`
-              }
-            </button>
+           <button
+  className="place-order-btn"
+  onClick={handlePlaceOrder}
+  disabled={loading || !cart?.items?.length}
+>
+  {loading
+    ? "Processing..."
+    : `Pay with ${formData.payment_method === "khalti" ? " Khalti" : "eSewa"} · Rs. ${grandTotal.toLocaleString()}`
+  }
+</button>
 
             {/* Back to cart */}
             <Link to="/cart" className="back-to-cart-btn">
